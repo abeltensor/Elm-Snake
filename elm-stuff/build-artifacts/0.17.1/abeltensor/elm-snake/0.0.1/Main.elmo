@@ -1,0 +1,328 @@
+var _abeltensor$elm_snake$Main$txt = function (msg) {
+	return _evancz$elm_graphics$Collage$toForm(
+		_evancz$elm_graphics$Element$centered(
+			_evancz$elm_graphics$Text$monospace(
+				A2(
+					_evancz$elm_graphics$Text$color,
+					_elm_lang$core$Color$black,
+					_evancz$elm_graphics$Text$fromString(msg)))));
+};
+var _abeltensor$elm_snake$Main$randPos = A2(
+	_elm_lang$core$Random$pair,
+	A2(_elm_lang$core$Random$float, 0, 1),
+	A2(_elm_lang$core$Random$float, 0, 1));
+var _abeltensor$elm_snake$Main$generator = A2(
+	_elm_lang$core$Random$pair,
+	A2(_elm_lang$core$Random$float, 0, 1),
+	_abeltensor$elm_snake$Main$randPos);
+var _abeltensor$elm_snake$Main$pos = F2(
+	function (v0, v1) {
+		return {ctor: '_Tuple2', _0: v0, _1: v1};
+	});
+var _abeltensor$elm_snake$Main$_p0 = {ctor: '_Tuple2', _0: 600, _1: 600};
+var _abeltensor$elm_snake$Main$width = _abeltensor$elm_snake$Main$_p0._0;
+var _abeltensor$elm_snake$Main$height = _abeltensor$elm_snake$Main$_p0._1;
+var _abeltensor$elm_snake$Main$isGameOver = F2(
+	function (newHead, newTail) {
+		return A2(
+			_elm_lang$core$List$any,
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				})(newHead),
+			newTail) || ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$fst(newHead),
+			_abeltensor$elm_snake$Main$width / 2) > 0) || ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$snd(newHead),
+			_abeltensor$elm_snake$Main$height / 2) > 0) || ((_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$fst(newHead),
+			(0 - _abeltensor$elm_snake$Main$width) / 2) < 0) || (_elm_lang$core$Native_Utils.cmp(
+			_elm_lang$core$Basics$snd(newHead),
+			(0 - _abeltensor$elm_snake$Main$height) / 2) < 0))));
+	});
+var _abeltensor$elm_snake$Main$spawnApple = F2(
+	function (randW, randH) {
+		var y = (randH * _abeltensor$elm_snake$Main$height) - (_abeltensor$elm_snake$Main$height / 2);
+		var x = (randW * _abeltensor$elm_snake$Main$width) - (_abeltensor$elm_snake$Main$width / 2);
+		return _elm_lang$core$Maybe$Just(
+			A2(_abeltensor$elm_snake$Main$pos, x, y));
+	});
+var _abeltensor$elm_snake$Main$appleRadius = 7.5;
+var _abeltensor$elm_snake$Main$isOverlap = F2(
+	function (_p2, _p1) {
+		var _p3 = _p2;
+		var _p4 = _p1;
+		var _p5 = {ctor: '_Tuple2', _0: _p4._0 - _p3._0, _1: _p4._1 - _p3._1};
+		var xd = _p5._0;
+		var yd = _p5._1;
+		var distance = _elm_lang$core$Basics$sqrt((xd * xd) + (yd * yd));
+		return _elm_lang$core$Native_Utils.cmp(distance, _abeltensor$elm_snake$Main$appleRadius * 2) < 1;
+	});
+var _abeltensor$elm_snake$Main$segmentDim = 15;
+var _abeltensor$elm_snake$Main$view = function (model) {
+	var content = function () {
+		var _p6 = model;
+		if (_p6.ctor === 'NotStarted') {
+			return _elm_lang$core$Native_List.fromArray(
+				[
+					_abeltensor$elm_snake$Main$txt('press SPACE to start')
+				]);
+		} else {
+			var _p8 = _p6._0;
+			var scoreLbl = _abeltensor$elm_snake$Main$txt(
+				_elm_lang$core$Basics$toString(_p6._2));
+			var tail = A2(
+				_elm_lang$core$List$map,
+				function (pos) {
+					return A2(
+						_evancz$elm_graphics$Collage$move,
+						pos,
+						A2(
+							_evancz$elm_graphics$Collage$filled,
+							_elm_lang$core$Color$green,
+							A2(_evancz$elm_graphics$Collage$rect, _abeltensor$elm_snake$Main$segmentDim, _abeltensor$elm_snake$Main$segmentDim)));
+				},
+				_p8.tail);
+			var head = A2(
+				_evancz$elm_graphics$Collage$move,
+				_p8.head,
+				A2(
+					_evancz$elm_graphics$Collage$filled,
+					_elm_lang$core$Color$green,
+					A2(_evancz$elm_graphics$Collage$rect, _abeltensor$elm_snake$Main$segmentDim, _abeltensor$elm_snake$Main$segmentDim)));
+			var _p7 = _p6._1;
+			if (_p7.ctor === 'Nothing') {
+				return A2(
+					_elm_lang$core$List_ops['::'],
+					scoreLbl,
+					A2(_elm_lang$core$List_ops['::'], head, tail));
+			} else {
+				return A2(
+					_elm_lang$core$List_ops['::'],
+					A2(
+						_evancz$elm_graphics$Collage$move,
+						_p7._0,
+						A2(
+							_evancz$elm_graphics$Collage$filled,
+							_elm_lang$core$Color$orange,
+							_evancz$elm_graphics$Collage$circle(_abeltensor$elm_snake$Main$appleRadius))),
+					A2(
+						_elm_lang$core$List_ops['::'],
+						scoreLbl,
+						A2(_elm_lang$core$List_ops['::'], head, tail)));
+			}
+		}
+	}();
+	var bg = A2(
+		_evancz$elm_graphics$Collage$filled,
+		_elm_lang$core$Color$grey,
+		A2(
+			_evancz$elm_graphics$Collage$rect,
+			_elm_lang$core$Basics$toFloat(_abeltensor$elm_snake$Main$width),
+			_elm_lang$core$Basics$toFloat(_abeltensor$elm_snake$Main$height)));
+	return _evancz$elm_graphics$Element$toHtml(
+		A3(
+			_evancz$elm_graphics$Collage$collage,
+			_abeltensor$elm_snake$Main$width,
+			_abeltensor$elm_snake$Main$height,
+			A2(_elm_lang$core$List_ops['::'], bg, content)));
+};
+var _abeltensor$elm_snake$Main$getNewSegment = F2(
+	function (_p9, direction) {
+		var _p10 = _p9;
+		var _p13 = _p10._1;
+		var _p12 = _p10._0;
+		var _p11 = direction;
+		switch (_p11.ctor) {
+			case 'Up':
+				return A2(_abeltensor$elm_snake$Main$pos, _p12, _p13 + _abeltensor$elm_snake$Main$segmentDim);
+			case 'Down':
+				return A2(_abeltensor$elm_snake$Main$pos, _p12, _p13 - _abeltensor$elm_snake$Main$segmentDim);
+			case 'Left':
+				return A2(_abeltensor$elm_snake$Main$pos, _p12 - _abeltensor$elm_snake$Main$segmentDim, _p13);
+			default:
+				return A2(_abeltensor$elm_snake$Main$pos, _p12 + _abeltensor$elm_snake$Main$segmentDim, _p13);
+		}
+	});
+var _abeltensor$elm_snake$Main$Snake = F3(
+	function (a, b, c) {
+		return {head: a, tail: b, direction: c};
+	});
+var _abeltensor$elm_snake$Main$Right = {ctor: 'Right'};
+var _abeltensor$elm_snake$Main$initSnake = function () {
+	var tail = A2(
+		_elm_lang$core$List$map,
+		function (n) {
+			return A2(_abeltensor$elm_snake$Main$pos, (0 - n) * _abeltensor$elm_snake$Main$segmentDim, 0);
+		},
+		_elm_lang$core$Native_List.range(1, 8));
+	var head = {ctor: '_Tuple2', _0: 0, _1: 0};
+	return {head: head, tail: tail, direction: _abeltensor$elm_snake$Main$Right};
+}();
+var _abeltensor$elm_snake$Main$Left = {ctor: 'Left'};
+var _abeltensor$elm_snake$Main$Down = {ctor: 'Down'};
+var _abeltensor$elm_snake$Main$Up = {ctor: 'Up'};
+var _abeltensor$elm_snake$Main$getNewDirection = F2(
+	function (keyCode, currentDir) {
+		var _p14 = function () {
+			var _p15 = _elm_lang$core$Char$fromCode(keyCode);
+			switch (_p15.valueOf()) {
+				case 'a':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_List.fromArray(
+							[_abeltensor$elm_snake$Main$Up, _abeltensor$elm_snake$Main$Down]),
+						_1: _abeltensor$elm_snake$Main$Left
+					};
+				case 'w':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_List.fromArray(
+							[_abeltensor$elm_snake$Main$Left, _abeltensor$elm_snake$Main$Right]),
+						_1: _abeltensor$elm_snake$Main$Up
+					};
+				case 'd':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_List.fromArray(
+							[_abeltensor$elm_snake$Main$Up, _abeltensor$elm_snake$Main$Down]),
+						_1: _abeltensor$elm_snake$Main$Right
+					};
+				case 's':
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_List.fromArray(
+							[_abeltensor$elm_snake$Main$Left, _abeltensor$elm_snake$Main$Right]),
+						_1: _abeltensor$elm_snake$Main$Down
+					};
+				default:
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_List.fromArray(
+							[]),
+						_1: currentDir
+					};
+			}
+		}();
+		var changeableDirs = _p14._0;
+		var newDir = _p14._1;
+		return A2(
+			_elm_lang$core$List$any,
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				})(currentDir),
+			changeableDirs) ? newDir : currentDir;
+	});
+var _abeltensor$elm_snake$Main$Started = F3(
+	function (a, b, c) {
+		return {ctor: 'Started', _0: a, _1: b, _2: c};
+	});
+var _abeltensor$elm_snake$Main$NotStarted = {ctor: 'NotStarted'};
+var _abeltensor$elm_snake$Main$init = {ctor: '_Tuple2', _0: _abeltensor$elm_snake$Main$NotStarted, _1: _elm_lang$core$Platform_Cmd$none};
+var _abeltensor$elm_snake$Main$Spawn = function (a) {
+	return {ctor: 'Spawn', _0: a};
+};
+var _abeltensor$elm_snake$Main$update = F2(
+	function (msg, model) {
+		var _p16 = model;
+		if (_p16.ctor === 'NotStarted') {
+			var _p17 = msg;
+			if ((_p17.ctor === 'KeyPress') && (_p17._0 === 32)) {
+				return {
+					ctor: '_Tuple2',
+					_0: A3(_abeltensor$elm_snake$Main$Started, _abeltensor$elm_snake$Main$initSnake, _elm_lang$core$Maybe$Nothing, 0),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			} else {
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			}
+		} else {
+			var _p23 = _p16._0;
+			var _p22 = _p16._2;
+			var _p21 = _p16._1;
+			var _p18 = msg;
+			switch (_p18.ctor) {
+				case 'KeyPress':
+					var newDir = A2(_abeltensor$elm_snake$Main$getNewDirection, _p18._0, _p23.direction);
+					var newSnake = _elm_lang$core$Native_Utils.update(
+						_p23,
+						{direction: newDir});
+					return {
+						ctor: '_Tuple2',
+						_0: A3(_abeltensor$elm_snake$Main$Started, newSnake, _p21, _p22),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
+				case 'Spawn':
+					if (_elm_lang$core$Native_Utils.cmp(_p18._0._0, 0.1) < 1) {
+						var newApple = A2(_abeltensor$elm_snake$Main$spawnApple, _p18._0._1._0, _p18._0._1._1);
+						return {
+							ctor: '_Tuple2',
+							_0: A3(_abeltensor$elm_snake$Main$Started, _p23, newApple, _p22),
+							_1: _elm_lang$core$Platform_Cmd$none
+						};
+					} else {
+						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					}
+				default:
+					var newHead = A2(_abeltensor$elm_snake$Main$getNewSegment, _p23.head, _p23.direction);
+					var ateApple = function () {
+						var _p19 = _p21;
+						if (_p19.ctor === 'Just') {
+							return A2(_abeltensor$elm_snake$Main$isOverlap, newHead, _p19._0);
+						} else {
+							return false;
+						}
+					}();
+					var newTail = ateApple ? A2(_elm_lang$core$List_ops['::'], _p23.head, _p23.tail) : A2(
+						_elm_lang$core$List_ops['::'],
+						_p23.head,
+						A2(
+							_elm_lang$core$List$take,
+							_elm_lang$core$List$length(_p23.tail) - 1,
+							_p23.tail));
+					var _p20 = ateApple ? {ctor: '_Tuple2', _0: _elm_lang$core$Maybe$Nothing, _1: _p22 + 1} : {ctor: '_Tuple2', _0: _p21, _1: _p22};
+					var newApple = _p20._0;
+					var newScore = _p20._1;
+					var newSnake = _elm_lang$core$Native_Utils.update(
+						_p23,
+						{head: newHead, tail: newTail});
+					var gameOver = A2(_abeltensor$elm_snake$Main$isGameOver, newHead, newTail);
+					return gameOver ? {ctor: '_Tuple2', _0: _abeltensor$elm_snake$Main$NotStarted, _1: _elm_lang$core$Platform_Cmd$none} : (_elm_lang$core$Native_Utils.eq(newApple, _elm_lang$core$Maybe$Nothing) ? {
+						ctor: '_Tuple2',
+						_0: A3(_abeltensor$elm_snake$Main$Started, newSnake, newApple, newScore),
+						_1: A2(_elm_lang$core$Random$generate, _abeltensor$elm_snake$Main$Spawn, _abeltensor$elm_snake$Main$generator)
+					} : {
+						ctor: '_Tuple2',
+						_0: A3(_abeltensor$elm_snake$Main$Started, newSnake, newApple, newScore),
+						_1: _elm_lang$core$Platform_Cmd$none
+					});
+			}
+		}
+	});
+var _abeltensor$elm_snake$Main$KeyPress = function (a) {
+	return {ctor: 'KeyPress', _0: a};
+};
+var _abeltensor$elm_snake$Main$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
+var _abeltensor$elm_snake$Main$subscriptions = function (model) {
+	var _p24 = model;
+	if (_p24.ctor === 'NotStarted') {
+		return _elm_lang$keyboard$Keyboard$presses(_abeltensor$elm_snake$Main$KeyPress);
+	} else {
+		return _elm_lang$core$Platform_Sub$batch(
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$keyboard$Keyboard$presses(_abeltensor$elm_snake$Main$KeyPress),
+					A2(
+					_elm_lang$core$Time$every,
+					_elm_lang$core$Time$inMilliseconds(50),
+					_abeltensor$elm_snake$Main$Tick)
+				]));
+	}
+};
+var _abeltensor$elm_snake$Main$main = {
+	main: _elm_lang$html$Html_App$program(
+		{init: _abeltensor$elm_snake$Main$init, view: _abeltensor$elm_snake$Main$view, update: _abeltensor$elm_snake$Main$update, subscriptions: _abeltensor$elm_snake$Main$subscriptions})
+};
